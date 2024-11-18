@@ -1,0 +1,53 @@
+# Use an Arch Linux base image
+FROM archlinux:latest
+
+# Install required dependencies
+RUN pacman -Syu --noconfirm \
+  sudo \
+  devtools \
+  base-devel \
+  git \
+  frameworkintegration \
+  gcc-libs \
+  glibc \
+  kcmutils \
+  kcolorscheme \
+  kconfig \
+  kcoreaddons \
+  kdecoration \
+  kguiaddons \
+  ki18n \
+  kiconthemes \
+  kirigami \
+  kwidgetsaddons \
+  kwindowsystem \
+  qt6-base \
+  qt6-declarative \
+  qt6-svg \
+  xdg-utils \
+  extra-cmake-modules \
+  kcmutils5 \
+  frameworkintegration5 \
+  kconfigwidgets5 \
+  kiconthemes5 \
+  kirigami2 \
+  kwindowsystem5
+
+# Add a user for non-root operations (required for sudo)
+RUN useradd -m builder && echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+
+# Switch to the builder user
+USER builder
+WORKDIR /home/builder
+
+# Clone the klassy repository
+RUN git clone https://github.com/paulmcauley/klassy.git /home/builder/klassy
+
+# Set the working directory
+WORKDIR /home/builder/klassy
+
+# Build klassy
+RUN git checkout plasma6.2 && ./install.sh
+
+# Final instructions (optional)
+CMD ["bash"]
